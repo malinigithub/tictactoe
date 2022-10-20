@@ -40,8 +40,19 @@ button {
 
 .red {
   color: red;
+  background-color: lightblue;
 }
 
 .white {
   color: white;
+}
+
+.blue {
+  color: blue;
+  background-color: lightblue;
+}
+
+.grey {
+  color: white;
+  background-color: grey;
 }

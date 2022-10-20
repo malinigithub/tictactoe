@@ -3,13 +3,18 @@ const Board = () => {
   // State keeps track of next player and gameState
   const [player, setPlayer] = React.useState(1);
   const [gameState, setGameState] = React.useState([]);
-  let status = `Winner is ${checkForWinner(gameState)}`;
+  let winner = checkForWinner(gameState)
+  let status = ``;
 
   // Part 1 step 1 code goes here
   // Use conditional logic to set a variable to either 'Player O' or  'Player X'
   let nextPlayer = player? `Next Player: Player X` :`Next Player: Player O`
-  console.log(`We hav a winner ${status}`);
-
+  
+  if (winner != 'N') {
+    status = `Winner is Player ${checkForWinner(gameState)}`;
+    nextPlayer = '';
+    console.log(`We hav a winner ${status}`);
+  }
   const takeTurn = (id) => {
     setGameState([...gameState, { id: id, player: player }]);
     setPlayer((player + 1) % 2); // get next player
@@ -17,7 +22,9 @@ const Board = () => {
   };
   function renderSquare(i) {
     // use properties to pass callback function takeTurn to Child
-    return <Square takeTurn={takeTurn} id={i}></Square>;
+    // /console.log('inrenderSquare')
+    return <Square takeTurn={takeTurn} id={i} winner={winner} ></Square>;
+    
   }
 
   return (
@@ -49,7 +56,7 @@ const Board = () => {
   );
 };
 
-const Square = ({ takeTurn, id }) => {
+const Square = ({ takeTurn, id,winner }) => {
   const mark = ['O', 'X', '+'];
   // id is the square's number
   // filled tells you if square has been filled
@@ -57,23 +64,25 @@ const Square = ({ takeTurn, id }) => {
   // You call takeTurn to tell Parent that the square has been filled
   const [filled, setFilled] = React.useState(false);
   const [tik, setTik] = React.useState(2);
-
-  return (
-    <button
-      // Part 2: update the return statement below to add css classes
-      className ={ tik==1? "red" : "white"}
-      onClick={() => {
-        setTik(takeTurn(id));
-        setFilled(true);
-        console.log(`Square: ${id} filled by player : ${tik}`);
-      }}
-    >
-    <h1>{mark[tik]}</h1> 
-    </button>
-  );
+    
+    return (
+      <button
+        // Part 2: update the return statement below to add css classes
+        className ={ [(winner=='N'? (tik==1? "red" : tik==0? "blue":"white"): "grey") ]}
+        onClick={() => {
+          setTik(takeTurn(id));
+          setFilled(true);
+          console.log(`Square: ${id} filled status ${filled} by player : ${tik}`);
+        }}
+        disabled = {(winner == 'N'? false: true) || (filled ? true: false)}
+      >
+      <h1>{mark[tik]}</h1> 
+      </button>
+    );
 };
 
 const Game = () => {
+  console.log("GameCOmponent")
   return (
     <div className="game">
       <Board></Board>
@@ -107,7 +116,7 @@ const checkPlayerTurn = (gameState) => {
 const checkForWinner = (gameState) => {
   // get array of box id's
   // can't be a winner in less than 5 turns
-  if (gameState.length < 5) return 'No Winner Yet';
+  if (gameState.length < 5) return 'N';
   let p0 = gameState.filter((item) => {
     if (item.player == 0) return item;
   });
@@ -124,9 +133,9 @@ const checkForWinner = (gameState) => {
       return isSuperset(new Set(px), new Set(item));
     });
   }
-  if (win0.length > 0) return 'Player O ';
-  else if (winX.length > 0) return 'Player X ';
-  return 'No Winner Yet';
+  if (win0.length > 0) return 'O';
+  else if (winX.length > 0) return 'X';
+  return 'N';
 };
 // check if subset is in the set
 function isSuperset(set, subset) {
